@@ -6,6 +6,7 @@ import ru.clevertec.product.data.ProductDto;
 import ru.clevertec.product.data.ProductTestData;
 import ru.clevertec.product.entity.Product;
 import ru.clevertec.product.mapper.ProductMapper;
+import ru.clevertec.product.mapper.ProductMapperImpl;
 
 import java.math.BigDecimal;
 
