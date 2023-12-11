@@ -3,7 +3,7 @@ package ru.clevertec.product.mapper.impl;
 import org.junit.jupiter.api.Test;
 import ru.clevertec.product.data.InfoProductDto;
 import ru.clevertec.product.data.ProductDto;
-import ru.clevertec.product.data.ProductTestData;
+import ru.clevertec.product.data.ProductTestBuilder;
 import ru.clevertec.product.entity.Product;
 import ru.clevertec.product.mapper.ProductMapper;
 import ru.clevertec.product.mapper.ProductMapperImpl;
@@ -14,13 +14,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ProductMapperImplTest {
 
-    private ProductMapper productMapper = new ProductMapperImpl();
+    private final ProductMapper productMapper = new ProductMapperImpl();
 
     @Test
     public void toProductShouldReturnProductWithoutUuid() {
         // given
-        ProductDto productDto = ProductTestData.builder().build().buildProductDto();
-        Product expected = ProductTestData.builder()
+        ProductDto productDto = ProductTestBuilder.builder().build().buildProductDto();
+        Product expected = ProductTestBuilder.builder()
                 .withUuid(null)
                 .build().buildProduct();
 
@@ -29,6 +29,7 @@ public class ProductMapperImplTest {
 
         // then
         assertThat(actual)
+                .hasFieldOrPropertyWithValue(Product.Fields.uuid, null)
                 .hasFieldOrPropertyWithValue(Product.Fields.name, expected.getName())
                 .hasFieldOrPropertyWithValue(Product.Fields.description, expected.getDescription())
                 .hasFieldOrPropertyWithValue(Product.Fields.price, expected.getPrice());
@@ -37,8 +38,8 @@ public class ProductMapperImplTest {
     @Test
     public void toInfoProductDtoShouldReturnInfoProductDtoWithUuid() {
         // given
-        InfoProductDto expected = ProductTestData.builder().build().buildInfoProductDto();
-        Product product = ProductTestData.builder().build().buildProduct();
+        InfoProductDto expected = ProductTestBuilder.builder().build().buildInfoProductDto();
+        Product product = ProductTestBuilder.builder().build().buildProduct();
 
         // when
         InfoProductDto actual = productMapper.toInfoProductDto(product);
@@ -54,13 +55,13 @@ public class ProductMapperImplTest {
     @Test
     public void mergeShouldReturnExpectedProductWithMergedNameAndDescriptionAndPrice() {
         // given
-        Product expected = ProductTestData.builder().build().buildProduct();
-        Product product = ProductTestData.builder()
+        Product expected = ProductTestBuilder.builder().build().buildProduct();
+        Product product = ProductTestBuilder.builder()
                 .withName("Компоте")
                 .withDescription("Чёто на умном")
                 .withPrice(BigDecimal.valueOf(33.3))
                 .build().buildProduct();
-        ProductDto productDto = ProductTestData.builder().build().buildProductDto();
+        ProductDto productDto = ProductTestBuilder.builder().build().buildProductDto();
 
         // when
         Product actual = productMapper.merge(product, productDto);

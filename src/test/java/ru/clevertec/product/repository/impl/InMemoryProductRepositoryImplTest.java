@@ -4,32 +4,30 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Spy;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.clevertec.product.data.ProductTestData;
+import ru.clevertec.product.data.ProductTestBuilder;
 import ru.clevertec.product.entity.Product;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static ru.clevertec.product.constant.ProductTestConstant.PRODUCT_TEST_UUID;
 
 @ExtendWith(MockitoExtension.class)
 public class InMemoryProductRepositoryImplTest {
 
-    @Spy
+    @InjectMocks
     private InMemoryProductRepository productRepository;
 
     @Test
     public void findByIdShouldReturnOptionalOfEmpty() {
         // given
-        UUID uuid = UUID.fromString("59006a5d-ec94-4aa4-a151-30307ebc32c9");
+        UUID uuid = PRODUCT_TEST_UUID;
 
         // when
         Optional<Product> actual = productRepository.findById(uuid);
@@ -64,36 +62,17 @@ public class InMemoryProductRepositoryImplTest {
                 .hasFieldOrPropertyWithValue(Product.Fields.created, expected.getCreated());
     }
 
-    public static Stream<Product> productProvider() {
-        return Stream.of(ProductTestData.builder().build().buildProduct(),
-                ProductTestData.builder()
-                        .withUuid(UUID.fromString("75e0abb5-c38c-41f4-ad0c-8067273eb3aa"))
-                        .withName("Роллы")
-                        .withDescription("Очень даже вкусные")
-                        .withPrice(BigDecimal.valueOf(7.99))
-                        .withCreated(LocalDateTime.of(
-                                2023, Month.OCTOBER, 27, 17, 20, 0))
-                        .build().buildProduct(),
-                ProductTestData.builder()
-                        .withUuid(UUID.fromString("a68ed10d-7adf-4014-aba8-3c4f80092da3"))
-                        .withName("Томат")
-                        .withDescription("Хорош для салатика")
-                        .withPrice(BigDecimal.valueOf(0.33))
-                        .withCreated(LocalDateTime.of(
-                                2023, Month.OCTOBER, 26, 12, 0, 0))
-                        .build().buildProduct());
-    }
-
     @Test
     public void deleteShouldInvokeMethodOneTime() {
         // given
-        UUID uuid = UUID.fromString("59006a5d-ec94-4aa4-a151-30307ebc32c6");
+        UUID uuid = PRODUCT_TEST_UUID;
 
-        // when
-        productRepository.delete(uuid);
+        // when, then
+        assertDoesNotThrow(
+                () -> productRepository.delete(uuid));
+    }
 
-        // then
-        verify(productRepository)
-                .delete(uuid);
+    public static Stream<Product> productProvider() {
+        return ProductTestBuilder.builder().build().buildListOfProducts().stream();
     }
 }

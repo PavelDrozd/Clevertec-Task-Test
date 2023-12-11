@@ -21,19 +21,26 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public InfoProductDto get(UUID uuid) {
-        Product product = productRepository.findById(uuid).orElseThrow(() -> new ProductNotFoundException(uuid));
-        return mapper.toInfoProductDto(product);
+        return productRepository.findById(uuid)
+                .map(mapper::toInfoProductDto)
+                .orElseThrow(() -> new ProductNotFoundException(uuid));
     }
 
     @Override
     public List<InfoProductDto> getAll() {
-        return productRepository.findAll().stream().map(mapper::toInfoProductDto).toList();
+        return productRepository.findAll().stream()
+                .map(mapper::toInfoProductDto)
+                .toList();
     }
 
     @Override
     public UUID create(ProductDto productDto) {
         checkNullProductDto(productDto);
-        Product product = mapper.toProduct(productDto);
+        Product product = Product.builder()
+                .name(productDto.name())
+                .description(productDto.description())
+                .price(productDto.price())
+                .build();
         return productRepository.save(product).getUuid();
     }
 
